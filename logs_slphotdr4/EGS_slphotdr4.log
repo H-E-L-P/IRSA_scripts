@@ -1,0 +1,14 @@
+* Hostname was NOT found in DNS cache
+*   Trying 134.4.54.87...
+* Connected to irsa.ipac.caltech.edu (134.4.54.87) port 80 (#0)
+> GET /TAP/async?QUERY=SELECT+objid,crowded,ra,dec,nmatches,nreject,nbands,i1_fluxtype,i2_fluxtype,i3_fluxtype,m1_fluxtype,i1_f_ap2,i1_df_ap1,i2_f_ap2,i2_df_ap1,i3_f_ap2,i3_df_ap1,i4_f_ap2,i4_df_ap1,m1_f_psf,m1_df_psf,i1_meannoise,i2_meannoise,i3_meannoise,i4_meannoise,i1_coverage,i2_coverage,i3_coverage,i4_coverage+FROM+slphotdr4+WHERE+CONTAINS(POINT('J2000',ra,dec),POLYGON('J2000',212.4,51.155,217.5,51.155,217.5,54.234,212.4,54.234))=1&FORMAT=FITS&PHASE=RUN HTTP/1.1
+> User-Agent: curl/7.37.1
+> Host: irsa.ipac.caltech.edu
+> Accept: */*
+> 
+< HTTP/1.1 303 See Other
+< Location: http://irsa.ipac.caltech.edu:80/TAP/async/1660657
+* no chunk, no close, no size. Assume close to signal end
+< 
+{ [data not shown]
+* Closing connection 0
