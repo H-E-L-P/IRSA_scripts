@@ -1,0 +1,69 @@
+#!/bin/bash/
+#----------------------------------------------------------------------
+# Purpose:
+#   To launch a set of queries to the IRSA TAP service dedicated to the 
+#   HELP fields and the servs* tables at IRSA
+#----------------------------------------------------------------------
+# Parameters
+#    $1 the name of the field  - purely to determine names of outputs
+#    $2-$5 RAMIN, RAMAX, DECMIN, DECMAX - all in decimal degrees
+#    $6 table name in IRSA (see irsa_tables.* or get latest versions from 
+#    curl -o irsa_tables.fits "http://irsa.ipac.caltech.edu/TAP/sync?QUERY=SELECT+*+FROM+TAP_SCHEMA.tables&FORMAT=FITS"
+#
+#----------------------------------------------------------------------
+# How to Improve:
+#     might be nice to 
+#
+#----------------------------------------------------------------------
+# Author(s): 
+#    Seb Oliver (University of Sussex)
+#----------------------------------------------------------------------
+# Date: 
+#    29th November 2015 (tested with commented header)
+#----------------------------------------------------------------------
+# Acknowledgement: 
+#    This script was produced as part of the Herschel Extragalactic 
+#    Legacy Project: HELP
+#    The research leading to these results has received funding from the 
+#    European Union Seventh Framework Programme FP7/2007-2013/ under 
+#    grant agreement no 607254.”
+#    "This publication reflects only the author’s view and the European 
+#     Union is not responsible for any use that may be made of the 
+#     information contained therein.” 
+#----------------------------------------------------------------------
+# end of header
+#--
+
+HELP_tap_irsa.csh CDFS-SWIRE 50.8 55.4 -30.439 -25.997 servscdfsi1
+HELP_tap_irsa.csh ELAIS-N1 237.9 247.9 52.441 57.526  servseni1
+HELP_tap_irsa.csh ELAIS-S1 6.4 11.2 -45.523 -41.603  servsesi1
+HELP_tap_irsa.csh Lockman-SWIRE 154.8 167.7 55.019 60.819 servslhi1
+HELP_tap_irsa.csh XMM-LSS 32.2 38.1 -7.454 -1.591  servsxmmi1
+
+
+set table=servs
+# moving the log files into a dedicated folder and generating the get_iras_files script
+mkdir logs_$table
+mv *$table*.log logs_$table
+cd logs_$table
+../make_get_files_script.csh
+cd ..
+
+# moving get_iras_files script into a dedicated data folder
+
+mkdir data_$table
+mv logs_$table/get_irsa_files.csh data_$table
+
+
+# getting the actual data files
+
+cd data_$table
+source get_irsa_files.csh 
+cd ..
+
+# merging the data files into one
+
+cd data_$table
+ls *.fits > fits_list.lis
+stilts tcat in=@fits_list.lis out=help_$table.fits
+cd ..

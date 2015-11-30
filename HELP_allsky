@@ -1,0 +1,89 @@
+#!/bin/bash/
+#----------------------------------------------------------------------
+# Purpose:
+#   To launch a set of queries to the IRSA TAP service dedicated to the 
+#   HELP fields and any pretty generic all-sky survey on IRSA
+#----------------------------------------------------------------------
+# Parameters
+#    $1 table name in IRSA (see irsa_tables.* or get latest versions from 
+#    curl -o irsa_tables.fits "http://irsa.ipac.caltech.edu/TAP/sync?QUERY=SELECT+*+FROM+TAP_SCHEMA.tables&FORMAT=FITS"
+#
+#----------------------------------------------------------------------
+# How to Improve:
+#     might be nice to 
+#
+#----------------------------------------------------------------------
+# Author(s): 
+#    Seb Oliver (University of Sussex)
+#----------------------------------------------------------------------
+# Date: 
+#    29th November 2015 (tested with commented header)
+#----------------------------------------------------------------------
+# Acknowledgement: 
+#    This script was produced as part of the Herschel Extragalactic 
+#    Legacy Project: HELP
+#    The research leading to these results has received funding from the 
+#    European Union Seventh Framework Programme FP7/2007-2013/ under 
+#    grant agreement no 607254.”
+#    "This publication reflects only the author’s view and the European 
+#     Union is not responsible for any use that may be made of the 
+#     information contained therein.” 
+#----------------------------------------------------------------------
+# end of header
+#--
+
+set table=msxc6
+
+# this command is nice an quick and good for testing
+HELP_tap_irsa.csh SA13 197.6 198.5 42.407 43.020  $table
+
+
+# the others will take longer
+HELP_tap_irsa.csh COSMOS 148.7 151.55 0.791 3.641 $table
+HELP_tap_irsa.csh GAMA-15 210.0 225.2 -2.530 3.433 $table
+HELP_tap_irsa.csh XMM-LSS 32.2 38.1 -7.454 -1.591  $table
+HELP_tap_irsa.csh Bootes 215.7 220.6 32.191 36.109  $table
+HELP_tap_irsa.csh CDFS-SWIRE 50.8 55.4 -30.439 -25.997 $table
+HELP_tap_irsa.csh ELAIS-N1 237.9 247.9 52.441 57.526  $table
+HELP_tap_irsa.csh GAMA-12 172.3 187.3 -3.474 2.518 $table
+HELP_tap_irsa.csh GAMA-09 127.2 142.2 -2.468 3.485 $table
+HELP_tap_irsa.csh Lockman-SWIRE 154.8 167.7 55.019 60.819 $table
+HELP_tap_irsa.csh EGS 212.4 217.5 51.155 54.234 $table
+HELP_tap_irsa.csh ELAIS-S1 6.4 11.2 -45.523 -41.603  $table
+HELP_tap_irsa.csh AKARI-NEP 264.6 275.3 64.484 68.471  $table
+HELP_tap_irsa.csh ELAIS-N2 246.1 252.3 39.090 42.950 $table
+HELP_tap_irsa.csh xFLS 255.6 262.5 57.917 60.768  $table
+HELP_tap_irsa.csh Herschel-Stripe-82 348.4 36.2 -9.117 8.856 $table
+HELP_tap_irsa.csh NGP 189.9 209.2 21.692 36.088  $table
+HELP_tap_irsa.csh SGP 337.2 26.9 -35.619 -24.512  $table
+HELP_tap_irsa.csh AKARI-SEP 66.2 75.4 -55.887 -51.682  $table
+HELP_tap_irsa.csh SPIRE-NEP 263.7 266.4 68.553 69.440  $table
+HELP_tap_irsa.csh SSDF 357.8 18.5 -60.499 -48.534  $table
+HELP_tap_irsa.csh HDF-N 188.1 190.4 6.0 1.760 $table
+HELP_tap_irsa.csh XMM-13hr 202.9 204.4 37.379 38.452  $table
+
+# moving the log files into a dedicated folder and generating the get_iras_files script
+mkdir logs_$table
+mv *$table.log logs_$table
+cd logs_$table
+../make_get_files_script.csh
+cd ..
+
+# moving get_iras_files script into a dedicated data folder
+
+mkdir data_$table
+mv logs_$table/get_irsa_files.csh data_$table
+
+
+# getting the actual data files
+
+cd data_$table
+source get_irsa_files.csh 
+cd ..
+
+# merging the data files into one
+
+cd data_$table
+ls *.fits > fits_list.lis
+stilts tcat in=@fits_list.lis out=help_$table.fits
+cd ..
